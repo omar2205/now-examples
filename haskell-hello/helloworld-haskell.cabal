@@ -1,0 +1,23 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: b823a2e4c27bc4b1489b98a7ef9fcd93c3a7297127e55c970fa4378c0a50e80e
+
+name:           helloworld-haskell
+version:        0.1.0.0
+build-type:     Simple
+cabal-version:  >= 1.10
+
+executable helloworld-haskell-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_helloworld_haskell
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , scotty
+    , text
+  default-language: Haskell2010
