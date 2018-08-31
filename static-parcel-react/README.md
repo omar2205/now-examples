@@ -9,7 +9,7 @@ or
 to create package.json
 
 ### Installing React, Parcel, Serve, and Node-sass
-`yarn add react react-dom parcel-bundler node-sass serve`
+`yarn add react react-dom parcel-bundler node-sass`
 
 
 Now Create index.html, src/index.js, and src/App.js
@@ -103,8 +103,7 @@ Our package.json should be somewhat like this
   "scripts": {
     "start": "parcel index.html --port 8080 --hmr-port 8181",
     "build": "parcel build index.html",
-    "clear-dist": "rm dist/*",
-    "now-start": "serve ./dist"
+    "clear-dist": "rm dist/*"
   },
   "dependencies": {
     "babel-preset-env": "^1.7.0",
@@ -112,8 +111,7 @@ Our package.json should be somewhat like this
     "node-sass": "^4.9.3",
     "parcel-bundler": "^1.9.7",
     "react": "^16.4.2",
-    "react-dom": "^16.4.2",
-    "serve": "^10.0.0"
+    "react-dom": "^16.4.2"
   }
 }
 ```
@@ -121,6 +119,60 @@ Our package.json should be somewhat like this
 Running `yarn start` or `npm start` Parcel will build our project to dist/
 and start a local dev server [localhost:8080](http://localhost:8080)
 
-### Deploying
+## Deploying (Setting up Docker to build our App)
+
+### Setting up now.json file
+Make a new file `now.json`
+```json
+{
+  "type": "static",
+  "build": {
+    "env": {
+      "CI": "true"
+    }
+  },
+  "static": {
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
+```
+
+- Define the type of deployment as `static`
+- Set the environment variable CI on the build stage
+- Configure the static deployment to return index.html if a path is not found.
+  The index.html rewrite rule will add support for Single Page Applications.
+
+
+Make a new file `Dockerfile` and the following
+```Dockerfile
+FROM mhart/alpine-node:10
+ARG CI
+WORKDIR /usr/src
+COPY package.json .
+RUN yarn install
+COPY . .
+RUN yarn build
+RUN mv ./dist /public
+```
+- Used Node:10 image and used the build variable CI
+- Installed dependencies
+- Build the App
+- Moved the build results to /public dir which Now will serve
+
+Now we gonna make sure the Docekr will ignore all files except `src/` and `package.json` and `yarn.lock`
+Make a new file `.dockerignore`
+```
+*
+!src
+!package.json
+!yarn.lock
+```
+
+### Deploy to Now
 To deploy our App we just run
 `now`
